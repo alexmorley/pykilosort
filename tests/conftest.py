@@ -66,3 +66,29 @@ def probe(data_path):
     probe = Bunch()
     probe.NchanTOT = 385
     # WARNING: indexing mismatch with MATLAB hence the -1
+    probe.chanMap = np.load(data_path / 'chanMap.npy').squeeze().astype(np.int64) - 1
+    probe.xc = np.load(data_path / 'xc.npy').squeeze()
+    probe.yc = np.load(data_path / 'yc.npy').squeeze()
+    probe.kcoords = np.load(data_path / 'kcoords.npy').squeeze()
+    return probe
+
+
+@fixture
+def probe_good(data_path, probe):
+    igood = np.load(data_path / 'igood.npy').squeeze()
+    probe.Nchan = np.sum(igood)
+    probe.chanMap = probe.chanMap[igood]
+    probe.xc = probe.xc[igood]
+    probe.yc = probe.yc[igood]
+    probe.kcoords = probe.kcoords[igood]
+    return probe
+
+
+@fixture(params=[np.float64, np.float32])
+def dtype(request):
+    return np.dtype(request.param)
+
+
+@fixture(params=[0, 1])
+def axis(request):
+    return request.param
