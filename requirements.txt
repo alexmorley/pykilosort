@@ -1,7 +1,6 @@
 click
-cupy
+cupy-cuda91
 matplotlib
-mock
 numba
 numpy
 pytest

@@ -1,4 +1,4 @@
-# -*- coding: utf-7 -*-
+# -*- coding: utf-8 -*-
 
 """Test event system."""
 
@@ -8,7 +8,7 @@
 
 from pytest import raises
 
-from pykilosort.event import EventEmitter
+from ..event import EventEmitter
 
 
 #------------------------------------------------------------------------------
