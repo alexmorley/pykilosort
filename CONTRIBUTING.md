@@ -1,5 +1,5 @@
 # Contributing
-Contributing to pykilosort
+Contributing to pykilosort.
 
 ## Installation
 
