@@ -35,6 +35,24 @@ class Bunch(dict):
         return Bunch(super(Bunch, self).copy())
 
 
+def copy_bunch(old_bunch):
+    """
+    A function to copy a bunch object with a deep copy of numpy arrays
+    :param old_bunch: Bunch object to be copied
+    :return: New Bunch object
+    """
+    assert isinstance(old_bunch, Bunch)
+
+    new_bunch = Bunch()
+    for key in old_bunch.keys():
+        if type(old_bunch[key]) == np.ndarray:
+            new_bunch[key] = old_bunch[key].copy()
+        else:
+            new_bunch[key] = old_bunch[key]
+
+    return new_bunch
+
+
 def p(x):
     print("shape", x.shape, "mean", "%5e" % x.mean())
     print(x[:2, :2])
@@ -394,3 +412,33 @@ def load_probe(probe_path):
         assert n in probe.keys()
 
     return probe
+
+
+def create_prb(probe):
+    chan_map = np.array(probe.chanMap)
+    xc, yc = np.array(probe.xc), np.array(probe.yc)
+    try:
+        bad_channels = np.array(probe.bad_channels)
+    except AttributeError:
+        bad_channels = np.array([])
+    probe_prb = {}
+    unique_channel_groups = np.unique(np.array(probe.kcoords))
+
+    for channel_group in unique_channel_groups:
+        probe_prb[channel_group] = {}
+
+        channel_group_pos = np.where(probe.kcoords == channel_group)
+        group_channels = chan_map[channel_group_pos]
+        group_xc = xc[channel_group_pos]
+        group_yc = yc[channel_group_pos]
+
+        probe_prb[channel_group]['channels'] = np.setdiff1d(group_channels, bad_channels).tolist()
+        geometry = {}
+
+        for c, channel in enumerate(group_channels):
+            geometry[channel] = (group_xc[c], group_yc[c])
+
+        probe_prb[channel_group]['geometry'] = geometry
+        probe_prb[channel_group]['graph'] = []
+
+    return probe_prb
